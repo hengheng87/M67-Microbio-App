@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M67 微免期末考衝刺系統 (V11.0 Modular)</title>
+    
+    <link rel="stylesheet" href="css/style.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        medical: { 50: '#f0f9ff', 100: '#e0f2fe', 600: '#0284c7', 800: '#075985', 900: '#0c4a6e' },
+                        source: { gb: '#dbeafe', lec: '#fce7f3', txt: '#dcfce7', clin: '#fef3c7' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen flex flex-col overflow-hidden">
+
+<header class="bg-medical-900 text-white shadow-lg z-50 shrink-0 transition-all duration-300 relative" id="mainHeader">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <button id="globalBackBtn" onclick="goBack()" class="hidden w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10 transition active:scale-95 text-medical-200 hover:text-white" title="返回上一頁">
+                <i class="fas fa-arrow-left text-lg"></i>
+            </button>
+            
+            <div class="cursor-pointer hover:opacity-80 transition flex items-center gap-2" onclick="renderDashboard()">
+                <i class="fas fa-virus-covid text-2xl text-medical-200"></i>
+                <div class="leading-tight">
+                    <h1 class="font-bold text-lg tracking-wide">微免戰情室</h1>
+                    <p class="text-[9px] text-medical-200 uppercase tracking-wider">Review V11.0</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-2">
+            <div class="hidden md:flex items-center bg-medical-800/80 rounded-full px-3 py-1.5 border border-medical-700 focus-within:border-teal-400 transition-all group">
+                <i class="fas fa-key text-yellow-400 text-xs mr-2"></i>
+                <input type="password" id="headerApiKey" placeholder="Paste Gemini API Key" 
+                    class="bg-transparent border-none text-xs text-white placeholder-medical-300 focus:ring-0 w-28 focus:w-64 transition-all outline-none"
+                    onchange="updateGlobalApiKey(this.value)">
+            </div>
+
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" 
+               class="hidden md:flex items-center gap-1 text-[10px] text-teal-300 hover:text-white border border-teal-500/30 rounded-full px-2 py-1 hover:bg-teal-500/20">
+                <span>Key</span><i class="fas fa-external-link-alt"></i>
+            </a>
+
+            <button onclick="document.getElementById('mobileKeyPanel').classList.toggle('hidden')" 
+                    class="md:hidden w-8 h-8 rounded-full bg-medical-800 text-yellow-400 flex items-center justify-center border border-medical-700 active:scale-95">
+                <i class="fas fa-key text-xs"></i>
+            </button>
+
+            <div class="flex items-center gap-2 bg-medical-800 px-2 pl-3 py-1.5 rounded-full border border-medical-600 cursor-pointer active:scale-95 transition select-none" onclick="document.getElementById('examToggle').click()">
+                <span class="text-xs font-medium"><i class="fas fa-user-graduate"></i></span>
+                <label class="relative inline-flex items-center cursor-pointer pointer-events-none">
+                    <input type="checkbox" id="examToggle" class="sr-only peer">
+                    <div class="w-8 h-4 bg-gray-500 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-green-500"></div>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div id="mobileKeyPanel" class="hidden md:hidden absolute top-16 left-0 w-full bg-medical-800 border-b border-medical-700 p-3 shadow-xl animate-fade-in">
+        <div class="flex gap-2">
+            <div class="flex-1 flex items-center bg-medical-900/50 rounded-lg px-3 py-2 border border-medical-600">
+                <i class="fas fa-key text-yellow-400 text-sm mr-2"></i>
+                <input type="password" id="mobileApiKeyInput" placeholder="在此貼上 API Key" 
+                    class="bg-transparent border-none text-sm text-white w-full focus:ring-0 outline-none"
+                    onchange="updateGlobalApiKey(this.value)">
+            </div>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" class="bg-teal-600 text-white px-3 rounded-lg flex items-center justify-center font-bold text-xs">
+                獲取
+            </a>
+        </div>
+    </div>
+</header>
+    <div class="flex flex-1 overflow-hidden">
+        <nav class="w-72 bg-white border-r border-gray-200 flex flex-col hidden md:flex h-full transition-all duration-300">
+            <div class="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center cursor-pointer hover:bg-gray-100" onclick="renderDashboard()">
+                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider"><i class="fas fa-compass mr-2"></i>總覽導航</h3>
+            </div>
+            <div class="p-3 border-b border-gray-100 bg-white">
+        <div class="relative">
+            <i class="fas fa-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
+            <input type="text" id="searchInput" placeholder="搜尋病毒、症狀、關鍵字..." 
+                class="w-full bg-gray-50 text-sm pl-9 pr-3 py-2 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-medical-600 focus:bg-white transition-all placeholder-gray-400"
+                oninput="handleSearch(this.value)">
+        </div>
+    </div>
+            <div class="flex-1 overflow-y-auto custom-scroll p-2 space-y-1" id="sidebarNav">
+                </div>
+            
+            <div class="p-3 border-t border-gray-200 bg-gray-50">
+                <div class="text-[10px] text-gray-500 space-y-1">
+                    <div class="flex items-center gap-2"><span class="w-2 h-2 rounded bg-source-gb border border-blue-200"></span> [Gb] M67共筆</div>
+                    <div class="flex items-center gap-2"><span class="w-2 h-2 rounded bg-source-txt border border-green-200"></span> [Txt] Murray Textbook</div>
+                    <div class="flex items-center gap-2"><span class="w-2 h-2 rounded bg-source-lec border border-pink-200"></span> [Lec] 授課簡報</div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="flex-1 overflow-y-auto custom-scroll bg-gray-50/50 relative p-6 md:p-10 scroll-smooth" id="contentArea">
+            </main>
+        
+        <aside class="w-64 bg-white border-l border-gray-200 hidden lg:block p-4 custom-scroll" id="rightSidebar">
+            <div class="sticky top-0">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">本頁目錄</h3>
+                <ul class="space-y-2 text-sm text-gray-600 pl-2" id="toc">
+                    </ul>
+            </div>
+        </aside>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+
+</body>
+</html>
