@@ -27,7 +27,7 @@ export const pastExamDB = [
             "(D) 214356"
         ],
         correctAnswer: "",
-        userNote: ""
+        userNote: " "
     },
     {
         id: "113-final-03",
@@ -1505,4 +1505,5 @@ const pastExamDB_112_Filtered = [
         userNote: ""
     }
 ];
+
 
