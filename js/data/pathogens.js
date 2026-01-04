@@ -1,4 +1,3 @@
-export const pathogenData = {
 const pathogenData = {
             'dna_pap_poly': {
                 category: 'DNA Viruses',
@@ -1612,4 +1611,3 @@ const pathogenData = {
                 ]
             }
         };
-};
