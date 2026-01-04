@@ -1,4 +1,4 @@
-const pathogenData = {
+export const pathogenData = {
             'dna_pap_poly': {
                 category: 'DNA Viruses',
                 title: "乳突瘤與多瘤病毒科 (Papilloma & Polyoma)",
@@ -1611,3 +1611,4 @@ const pathogenData = {
                 ]
             }
         };
+
