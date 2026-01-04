@@ -1,5 +1,4 @@
 export const pastExamDB = [
-const pastExamDB = [
     {
         id: "113-final-01",
         source: "113-微免期末",
@@ -1505,5 +1504,4 @@ const pastExamDB_112_Filtered = [
         correctAnswer: "",
         userNote: ""
     }
-];
 ];
